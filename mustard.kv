@@ -146,6 +146,10 @@
             text: 'Image size: ' + str(image.texture_size)
             id: texture_size_label
             halign: 'center'
+        Label:
+            text: 'Data Rate: {:.2f}'.format(root.data_rate)
+            id: texture_size_label
+            halign: 'center'
     Image:
         id: image
         allow_stretch: True

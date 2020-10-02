@@ -24,7 +24,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.slider import Slider
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.label import Label
-from kivy.properties import BooleanProperty, StringProperty, ListProperty, DictProperty
+from kivy.properties import BooleanProperty, StringProperty, ListProperty, DictProperty, NumericProperty
 from kivy.metrics import dp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
@@ -54,6 +54,7 @@ class Viewer(BoxLayout):
     flipHoriz = BooleanProperty(False)
     flipVert = BooleanProperty(False)
     settings = DictProperty({}, allownone=True)
+    data_rate = NumericProperty(0.0)
     title = StringProperty('Title')
     colorfmt = 'luminance'
     orientation = 'vertical'
@@ -65,6 +66,7 @@ class Viewer(BoxLayout):
         self.cm = get_cmap('tab20')
         self.current_time = 0
         self.current_time_window = 0
+        self.last_time_data_rate_update = None
 
     def on_visualisers(self, instance, value):
         if self.visualisers is not None and self.visualisers:
@@ -209,3 +211,10 @@ class Viewer(BoxLayout):
             data_dict[v.data_type] = {}
             data_dict[v.data_type] = v.get_frame(time_value, time_window, **self.settings[v.data_type])
         self.data.update(data_dict)
+        if self.last_time_data_rate_update is not None:
+            time_elapsed = abs(time_value - self.last_time_data_rate_update)
+            if time_elapsed > 0.1:
+                self.data_rate = float(self.visualisers[0].data_rate)
+                self.last_time_data_rate_update = time_value
+        else:
+            self.last_time_data_rate_update = time_value
